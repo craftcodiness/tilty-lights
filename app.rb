@@ -1,17 +1,27 @@
 require 'faye/websocket'
-require 'permessage_deflate'
 require 'rack'
 
 static  = Rack::File.new(File.dirname(__FILE__))
-options = {:extensions => [PermessageDeflate], :ping => 5}
+#options = {:extensions => [PermessageDeflate], :ping => 5}
 
 App = lambda do |env|
   if Faye::WebSocket.websocket?(env)
-    ws = Faye::WebSocket.new(env, ['irc', 'xmpp'], options)
+    ws = Faye::WebSocket.new(env)
     p [:open, ws.url, ws.version, ws.protocol]
 
+    ws.onopen = lambda do |event|
+      p "Opening!"
+      ws.send("hello")
+    end
+
     ws.onmessage = lambda do |event|
+      p "I got a message"
+      p event.data
       ws.send(event.data)
+    end
+
+    ws.onerror = lambda do |event|
+      p [:error, event]
     end
 
     ws.onclose = lambda do |event|
@@ -20,35 +30,11 @@ App = lambda do |env|
     end
 
     ws.rack_response
-
-  elsif Faye::EventSource.eventsource?(env)
-    es   = Faye::EventSource.new(env)
-    time = es.last_event_id.to_i
-
-    p [:open, es.url, es.last_event_id]
-
-    loop = EM.add_periodic_timer(2) do
-      time += 1
-      es.send("Time: #{time}")
-      EM.add_timer(1) do
-        es.send('Update!!', :event => 'update', :id => time) if es
-      end
-    end
-
-    es.send("Welcome!\n\nThis is an EventSource server.")
-
-    es.onclose = lambda do |event|
-      EM.cancel_timer(loop)
-      p [:close, es.url]
-      es = nil
-    end
-
-    es.rack_response
-
   else
     static.call(env)
   end
 end
 
-def App.log(message)
+def App.log(message) 
+  puts "Message: #{message}"
 end
