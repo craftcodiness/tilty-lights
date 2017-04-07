@@ -2,22 +2,25 @@
 // websockets
 ////////////////////////////
 
-var aurthur_url = "ws://99d617a5.ngrok.io"
-var arthur_socket = new WebSocket(aurthur_url);
+create_socket = function() {
+  var result = new WebSocket("ws://" + window.location.host);
+  result.onopen = function (event) {
+    console.log("Websocket connection opened");
+  };
 
-arthur_socket.onopen = function (event) {
-  arthur_socket.send("Here's some text that the server is urgently awaiting!"); 
-};
 
+  result.onmessage = function (event) {
+    console.log('recived', event.data);
+  }
 
-arthur_socket.onmessage = function (event) {
-  console.log('recived', event.data);
+  result.onerror = function(event){
+    console.log("error", event.data)
+
+  }
+  return result;
 }
 
-arthur_socket.onerror = function(event){
-  console.log("error", event.data)
-
-}
+var socket = create_socket();
 
 update_debug = function(data) {
   var data_div = document.getElementById('debug_data')
@@ -41,10 +44,12 @@ update_websocket = function (data) {
     gamma: data.do.gamma
   }
 
-  //console.log(JSON.stringify(data_json))
-  arthur_socket.send(JSON.stringify(data_json));
-  arthur_socket.send("fuck you");
-
+  if (socket.readyState === socket.CLOSED) {
+    socket = create_socket(); 
+  }
+  if (socket.readyState === socket.OPEN) {
+    socket.send(JSON.stringify(data_json));
+  }
 }
 
 ////////////////////////////
@@ -54,7 +59,7 @@ update_websocket = function (data) {
 
 var gn = new GyroNorm();
 
-gn_opts = {frequency: 2000}
+gn_opts = {frequency: 500}
 
 gn.init(gn_opts).then(function(){
   gn.start(function(data){
