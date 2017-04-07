@@ -1,6 +1,6 @@
 # Tilty and Wilty
 
-It tilts, it wilts! Visualise the orientation of your smartphone using an LED ring attached to an Ardino!
+It tilts, it wilts! Visualise the orientation of your smartphone using an LED ring attached to an Arduino!
 
 This application will launch a webserver to which your smartphone can connect. Using Javascript from the phone's browser, accelerometer data will be posted to the server, which is then rendered over the serial port as pixel data by an Arduino.
 
