@@ -1,36 +1,6 @@
-require 'serialport'
+require 'arduino-lights'
 
-module Arduino
-  SERIAL_PORT = "/dev/ttyUSB0"
-  SERIAL_RATE = 115200
-  PIXELS = 24
-
-  def self.serial_port
-    @port ||= begin
-      res = SerialPort.new(SERIAL_PORT, baud: SERIAL_RATE)
-      sleep(2)
-      res
-    end
-  end
-
-  def self.set_pixel(pixel, red, green, blue)
-    sleep(0.01)
-    # first byte is whice led number to switch on
-    self.serial_port.write(pixel.chr)     
-
-    # next 3 bytes are red, green and blue values
-    # Note: 255 signifies the end of the command, so don't try and set an led value to that
-    self.serial_port.write(red.chr)    
-    self.serial_port.write(green.chr)    
-    self.serial_port.write(blue.chr)
-
-    # then end with a termination character
-    self.serial_port.write(255.chr)  
-  end
-
-  def self.radial_pixel_index(value, range)
-    (((PIXELS.to_f * value) / range).floor + PIXELS) % PIXELS
-  end
+module ArduinoLights
 
   def self.render_accelerometer_data(json)
     puts "Accelerometer data: #{json.inspect}"
@@ -42,4 +12,5 @@ module Arduino
       set_pixel(PIXELS - i - 1, pixel[0], pixel[1], pixel[2])
     end
   end
+
 end

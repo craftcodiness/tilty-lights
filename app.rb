@@ -13,7 +13,7 @@ App = lambda do |env|
     ws.onmessage = lambda do |event|
       begin
         json = JSON.parse(event.data)
-        Arduino.render_accelerometer_data(json)
+        ArduinoLights.render_accelerometer_data(json)
       rescue => e
         p "Unable to parse json: #{e}"
       end

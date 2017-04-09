@@ -1,6 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    arduino-lights (0.0.1)
+      serialport (= 1.3.1)
     daemons (1.2.4)
     eventmachine (1.2.3)
     faye-websocket (0.10.7)
@@ -20,9 +22,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  arduino-lights
   faye-websocket
   rack
-  serialport
   thin
 
 RUBY VERSION
